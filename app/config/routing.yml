@@ -1,0 +1,27 @@
+app:
+    resource: "@AppBundle/Controller/"
+    type:     annotation
+
+json:
+    path: /json
+    defaults: { _controller: AppBundle\Controller\JsonMakerController::indexAction}
+    
+report:
+    path: /
+    defaults: { _controller: AppBundle\Controller\ReportController::indexAction}    
+    
+avail_report:
+    path: /ava_report
+    defaults: { _controller: AppBundle\Controller\ReportController::getAvailabilityReport}
+    
+perf_report:
+    path: /perf
+    defaults: { _controller: AppBundle\Controller\PerfDataReportController::getReport}
+    
+testing:
+    path: /test
+    defaults: { _controller: AppBundle\Controller\PerfDataReportController::testing}
+    
+avail_json:
+    path: /ava/json
+    defaults: { _controller: AppBundle\Controller\PerfDataReportController::jsonRequest}
