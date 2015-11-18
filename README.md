@@ -14,7 +14,7 @@ Structure
     - Command
       - CurlUploadCommand.php => a PHP script that will upload the xlsx report via HTTP to my private server using cURL
       - EmailCommand.php => PHP script that is run by crontab to email every 10:00 PM
-        Controller
+    - Controller
       - PerDataReportController.php => Symfony controller that call classes in Model/Performance to output performance report
       - ReportController.php => Symfony controller that call classes in Model/Availability to output availability report
     - DbObject
