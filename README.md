@@ -8,9 +8,9 @@ My program capture data from Icinga's database every 15 min using crontab and PH
 
 Structure
 
-*src<br />
-  *AppBundle<br />
-    *Command<br />
+- src<br />
+  - AppBundle<br />
+    - Command<br />
       - CurlUploadCommand.php => a PHP script that will upload the xlsx report via HTTP to my private server using cURL<br />
       - EmailCommand.php => PHP script that is run by crontab to email every 10:00 PM<br />
         Controller<br />
