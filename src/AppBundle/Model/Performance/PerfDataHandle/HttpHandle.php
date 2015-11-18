@@ -1,5 +1,5 @@
 <?php
-namespace AppBundle\DbObject\PerfDataHandle;
+namespace AppBundle\Model\Performance\PerfDataHandle;
 
 class HttpHandle {
     public function parseData($rawDataArray){

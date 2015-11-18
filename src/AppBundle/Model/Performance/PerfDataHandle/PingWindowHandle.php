@@ -1,38 +1,28 @@
 <?php
-namespace AppBundle\DbObject\PerfDataHandle;
-
-class CpuLinuxHandle {
-    public function parseData($rawDataArray){
+namespace AppBundle\Model\Performance\PerfDataHandle;
+class PingWindowHandle {
+    public function parseData($rawDataArray){       
         $outputArray = array();
         foreach ($rawDataArray as $timestamp => $dataArray) {
-            preg_match("/load1=([0-9.]+);.+load5=([0-9.]+).+load15=([0-9.]+);/", $dataArray["perfdata"], $match);
+            preg_match("/rta=(.+)ms.+pl=(.+)%/", $dataArray["perfdata"], $match);
             if (!empty($match)) {
-                $load1Min = $match[1];
-                $load5Min = $match[2];
-                $load15Min = $match[3];
+                $roundTripTime = $match[1];
             } else {
                 //Should throw some error later
-                $load1Min = $dataArray["perfdata"];
-                $load5Min = $dataArray["perfdata"];
-                $load15Min = $dataArray["perfdata"];
+                $roundTripTime = $dataArray["output"];
             }
-            $outputArray[$timestamp]["1 min avg Load"] = $load1Min;
-            $outputArray[$timestamp]["5 min avg Load"] = $load5Min;
-            $outputArray[$timestamp]["15 min avg Load"] = $load15Min;
+            $outputArray[$timestamp]["Round Trip Time (ms)"] = $roundTripTime;
         }
         return $outputArray;
+
     }
-    
     public function parseDataDayAverage($rawDataArray) {
         $outputArray = array();
-        $tempArray = array();
         $data = $this->parseData($rawDataArray);
         foreach ($data as $timestamp => $dataSet) {
             preg_match("/^([0-9-]+) ([0-9:]+)$/", $timestamp, $match);
             $date = $match[1];
-            $tempArray[$date]["1 min avg Load"][] = $dataSet["1 min avg Load"];
-            $tempArray[$date]["5 min avg Load"][] = $dataSet["5 min avg Load"];
-            $tempArray[$date]["15 min avg Load"][] = $dataSet["15 min avg Load"];
+            $tempArray[$date]["Round Trip Time (ms)"][] =$dataSet["Round Trip Time (ms)"];
         }
         foreach ($tempArray as $datestamp => $tempDataSetArray) {
             foreach ($tempDataSetArray as $dataSetName => $allData) {
@@ -51,9 +41,6 @@ class CpuLinuxHandle {
                 }
             }            
         }
-        
         return $outputArray;
     }
-    
-    
 }

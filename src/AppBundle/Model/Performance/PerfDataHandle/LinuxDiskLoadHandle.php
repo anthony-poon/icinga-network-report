@@ -1,20 +1,30 @@
 <?php
-namespace AppBundle\DbObject\PerfDataHandle;
-class PingWindowHandle {
-    public function parseData($rawDataArray){       
+namespace AppBundle\Model\Performance\PerfDataHandle;
+
+class LinuxDiskLoadHandle {
+    //put your code here
+    public function parseData($rawDataArray){
         $outputArray = array();
         foreach ($rawDataArray as $timestamp => $dataArray) {
-            preg_match("/rta=(.+)ms.+pl=(.+)%/", $dataArray["perfdata"], $match);
+            preg_match("/([\\d]+) MB .+$/", $dataArray["output"], $match);
             if (!empty($match)) {
-                $roundTripTime = $match[1];
+                $availSpace = $match[1];
             } else {
                 //Should throw some error later
-                $roundTripTime = $dataArray["output"];
+                $availSpace = $dataArray["output"];
             }
-            $outputArray[$timestamp]["Round Trip Time (ms)"] = $roundTripTime;
+            preg_match("/;(\\d+)$/", $dataArray["perfdata"], $match);
+            if (!empty($match)) {
+                $totalSpace = $match[1];
+            } else {
+                //Should throw some error later
+                $totalSpace = $dataArray["output"];
+            }
+            
+            $outputArray[$timestamp]["Available Space (MB)"] = $availSpace;
+            $outputArray[$timestamp]["Total Space (MB)"] = $totalSpace;
         }
         return $outputArray;
-
     }
     public function parseDataDayAverage($rawDataArray) {
         $outputArray = array();
@@ -22,7 +32,8 @@ class PingWindowHandle {
         foreach ($data as $timestamp => $dataSet) {
             preg_match("/^([0-9-]+) ([0-9:]+)$/", $timestamp, $match);
             $date = $match[1];
-            $tempArray[$date]["Round Trip Time (ms)"][] =$dataSet["Round Trip Time (ms)"];
+            $tempArray[$date]["Available Space (MB)"][] = $dataSet["Available Space (MB)"];
+            $tempArray[$date]["Total Space (MB)"][] = $dataSet["Total Space (MB)"];
         }
         foreach ($tempArray as $datestamp => $tempDataSetArray) {
             foreach ($tempDataSetArray as $dataSetName => $allData) {

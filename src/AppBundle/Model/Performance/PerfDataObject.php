@@ -1,5 +1,5 @@
 <?php
-namespace AppBundle\DbObject;
+namespace AppBundle\Model\Performance;
 
 use AppBundle\DbObject\ClassicDbConnector;
 use PDO;
@@ -60,7 +60,7 @@ class PerfDataObject {
         $result = $query->fetch(PDO::FETCH_ASSOC);
         $this->displayName = $result["display_name"];
         if (!empty($result["parser_class"])) {
-            $className = "AppBundle\\DbObject\\PerfDataHandle\\".$result["parser_class"];
+            $className = "AppBundle\\Model\\Performance\\PerfDataHandle\\".$result["parser_class"];
             $this->dataHandle = new $className();
         }
     }

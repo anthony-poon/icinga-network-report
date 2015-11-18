@@ -1,26 +1,28 @@
 <?php
-namespace AppBundle\DbObject\PerfDataHandle;
-class MemoryWindowHandle {
+namespace AppBundle\Model\Performance\PerfDataHandle;
+
+class MemoryLinuxHandle {
+    //put your code here
     public function parseData($rawDataArray){
         $outputArray = array();
         foreach ($rawDataArray as $timestamp => $dataArray) {
-            preg_match("/=([0-9.]+)Mb.+;([0-9.]+)/", $dataArray["perfdata"], $match);
+            preg_match("/Total: ([\\d]+) MB - Used: ([\\d]+) MB/", $dataArray["output"], $match);
             if (!empty($match)) {
-                $memoryUsage = $match[1];
-                $totalUsage = $match[2];
+                $totalMemory = $match[1];
+                $usedMemory = $match[2];
             } else {
                 //Should throw some error later
-                $memoryUsage = $dataArray["output"];
-                $totalUsage = $dataArray["output"];
+                $totalMemory = $dataArray["output"];
+                $usedMemory = $dataArray["output"];
             }
-            
-            $outputArray[$timestamp]["Memory usage(MB)"] = $memoryUsage;
-            $outputArray[$timestamp]["Total Memory(MB)"] = $totalUsage;
+            $outputArray[$timestamp]["Memory usage(MB)"] = $usedMemory;
+            $outputArray[$timestamp]["Total Memory(MB)"] = $totalMemory;
         }
         return $outputArray;
     }
     public function parseDataDayAverage($rawDataArray) {
         $outputArray = array();
+        $tempArray = array();
         $data = $this->parseData($rawDataArray);
         foreach ($data as $timestamp => $dataSet) {
             preg_match("/^([0-9-]+) ([0-9:]+)$/", $timestamp, $match);

@@ -1,5 +1,5 @@
 <?php
-namespace AppBundle\DbObject\PerfDataHandle;
+namespace AppBundle\Model\Performance\PerfDataHandle;
 
 //Hard code to Gb first
 class WindowNscpDriveLoad {

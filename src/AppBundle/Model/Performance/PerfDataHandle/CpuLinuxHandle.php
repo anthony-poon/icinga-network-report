@@ -1,25 +1,28 @@
 <?php
-namespace AppBundle\DbObject\PerfDataHandle;
+namespace AppBundle\Model\Performance\PerfDataHandle;
 
-class MemoryLinuxHandle {
-    //put your code here
+class CpuLinuxHandle {
     public function parseData($rawDataArray){
         $outputArray = array();
         foreach ($rawDataArray as $timestamp => $dataArray) {
-            preg_match("/Total: ([\\d]+) MB - Used: ([\\d]+) MB/", $dataArray["output"], $match);
+            preg_match("/load1=([0-9.]+);.+load5=([0-9.]+).+load15=([0-9.]+);/", $dataArray["perfdata"], $match);
             if (!empty($match)) {
-                $totalMemory = $match[1];
-                $usedMemory = $match[2];
+                $load1Min = $match[1];
+                $load5Min = $match[2];
+                $load15Min = $match[3];
             } else {
                 //Should throw some error later
-                $totalMemory = $dataArray["output"];
-                $usedMemory = $dataArray["output"];
+                $load1Min = $dataArray["perfdata"];
+                $load5Min = $dataArray["perfdata"];
+                $load15Min = $dataArray["perfdata"];
             }
-            $outputArray[$timestamp]["Memory usage(MB)"] = $usedMemory;
-            $outputArray[$timestamp]["Total Memory(MB)"] = $totalMemory;
+            $outputArray[$timestamp]["1 min avg Load"] = $load1Min;
+            $outputArray[$timestamp]["5 min avg Load"] = $load5Min;
+            $outputArray[$timestamp]["15 min avg Load"] = $load15Min;
         }
         return $outputArray;
     }
+    
     public function parseDataDayAverage($rawDataArray) {
         $outputArray = array();
         $tempArray = array();
@@ -27,8 +30,9 @@ class MemoryLinuxHandle {
         foreach ($data as $timestamp => $dataSet) {
             preg_match("/^([0-9-]+) ([0-9:]+)$/", $timestamp, $match);
             $date = $match[1];
-            $tempArray[$date]["Memory usage(MB)"][] = $dataSet["Memory usage(MB)"];
-            $tempArray[$date]["Total Memory(MB)"][] = $dataSet["Total Memory(MB)"];
+            $tempArray[$date]["1 min avg Load"][] = $dataSet["1 min avg Load"];
+            $tempArray[$date]["5 min avg Load"][] = $dataSet["5 min avg Load"];
+            $tempArray[$date]["15 min avg Load"][] = $dataSet["15 min avg Load"];
         }
         foreach ($tempArray as $datestamp => $tempDataSetArray) {
             foreach ($tempDataSetArray as $dataSetName => $allData) {
@@ -47,6 +51,9 @@ class MemoryLinuxHandle {
                 }
             }            
         }
+        
         return $outputArray;
     }
+    
+    
 }
