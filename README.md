@@ -1,6 +1,10 @@
 Icinga Network Report
 ======
-
+<style>
+    .indent {
+        padding-left: 10px;
+    }
+</style>
 <b>A Symfony project created on September 21, 2015, 9:38 am.</b>
 I wrote this project for my company to monitor network performance. The monitoring itself is done my Icinga2, a netowrk monitor program forked from Nagios. Performance data is inserted into MySql database using IDOUtils, a plugin provided by Icinga also.
 
@@ -8,6 +12,7 @@ My program capture data from Icinga's database every 15 min using crontab and PH
 
 Structure
 
+<div class="indent">
 src
   AppBundle
     Command
@@ -33,3 +38,4 @@ src
       To be called by controller to output excel. Use PHPExcel.
     tmp
       Temp folder to store files that will be upload to my private server,
+</div>
