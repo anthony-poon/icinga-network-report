@@ -16,20 +16,20 @@ Structure
         Controller
       - PerDataReportController.php => Symfony controller that call classes in Model/Performance to output performance report
       - ReportController.php => Symfony controller that call classes in Model/Availability to output availability report
-    DbObject
+    - DbObject
       - ClassicDbConnector.php => Predefined PDO object to connect to self database
       - IcingaDbConnector.php => Predefinded PDO object to connect to Icinga's database
-    IdoDataGrabber
+    - IdoDataGrabber
       - PHP scripts that run seperate from Symfony. Run directly from command line / crontab. Grab data from Icinga and insert into self db
-        To Do:
-          write into Symfony Cli.
-    Model
-      Contains all the data/model object
+        - To Do:
+          - Rewrite into Symfony Cli.
+    - Model
+      - Contains all the data/model object
         - Availability => Data object for availability report
         - Performance => Data object for performance report
-          PerfDataHandle => Parser that convert Nagios perfdata (String) into numerical data. The handle is registered in database.
-          PerfDataObject => Query database and decide which handle will be called. Output object for View
-    View
-      To be called by controller to output excel. Use PHPExcel.
-    tmp
-      Temp folder to store files that will be upload to my private server
+          - PerfDataHandle => Parser that convert Nagios perfdata (String) into numerical data. The handle is registered in database.
+          - PerfDataObject => Query database and decide which handle will be called. Output object for View
+    - View
+      - To be called by controller to output excel. Use PHPExcel.
+    - tmp
+      - Temp folder to store files that will be upload to my private server
