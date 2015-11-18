@@ -1,21 +1,16 @@
 Icinga Network Report
 ======
-<style>
-    .indent {
-        padding-left: 10px;
-    }
-</style>
-<b>A Symfony project created on September 21, 2015, 9:38 am.</b>
+
+A Symfony project created on September 21, 2015, 9:38 am.
 I wrote this project for my company to monitor network performance. The monitoring itself is done my Icinga2, a netowrk monitor program forked from Nagios. Performance data is inserted into MySql database using IDOUtils, a plugin provided by Icinga also.
 
 My program capture data from Icinga's database every 15 min using crontab and PHP scripts. It will output an availability and performance report via HTTP request. Another cron job will run every 10:00 PM everyday to send the report via Symfony's mailer.
 
 Structure
 
-<div class="indent">
-src
-  AppBundle
-    Command
+*src
+  *AppBundle
+    *Command
       - CurlUploadCommand.php => a PHP script that will upload the xlsx report via HTTP to my private server using cURL
       - EmailCommand.php => PHP script that is run by crontab to email every 10:00 PM
         Controller
