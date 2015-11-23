@@ -3,7 +3,7 @@ namespace AppBundle\DbObject;
 
 use PDO;
 
-class ClassicDbConnector extends PDO{
+class ReportDbConnector extends PDO{
     //put your code here
     const DB_ENGI = "mysql";
     const DB_NAME = "ido_reporting";
@@ -18,14 +18,14 @@ class ClassicDbConnector extends PDO{
     }
     
     public function getAllServiceId() {
-        $statement = "SELECT service_id FROM ".self::DB_PREFIX."data_object_definition WHERE (include_in_excel = 1)";
+        $statement = "SELECT service_id FROM ".self::DB_PREFIX."perf_object_definition WHERE (include_in_excel = 1)";
         $query = $this->prepare($statement);
         $query->execute();
         return array_column($query->fetchAll(PDO::FETCH_ASSOC), "service_id");
     }
     
     public function getServiceIdByHostId($groupId) {
-        $statement = "SELECT data_table.service_id FROM ".self::DB_PREFIX."group_mapping AS group_table INNER JOIN ".self::DB_PREFIX."data_object_definition AS data_table ON (group_table.service_uid = data_table.uid) WHERE (group_table.group_id = :group_id)";
+        $statement = "SELECT data_table.service_id FROM ".self::DB_PREFIX."group_mapping AS group_table INNER JOIN ".self::DB_PREFIX."perf_object_definition AS data_table ON (group_table.service_uid = data_table.uid) WHERE (group_table.group_id = :group_id)";
         $query = $this->prepare($statement);        
         $query->bindValue(":group_id", $groupId);
         $query->execute();        

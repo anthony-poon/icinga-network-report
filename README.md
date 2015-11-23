@@ -18,7 +18,7 @@ Structure
       - PerDataReportController.php => Symfony controller that call classes in Model/Performance to output performance report
       - ReportController.php => Symfony controller that call classes in Model/Availability to output availability report
     - DbObject
-      - ClassicDbConnector.php => Predefined PDO object to connect to self database
+      - ReportDbConnector.php => Predefined PDO object to connect to self database
       - IcingaDbConnector.php => Predefinded PDO object to connect to Icinga's database
     - IdoDataGrabber
       - PHP scripts that run seperate from Symfony. Run directly from command line / crontab. Grab data from Icinga and insert into self db

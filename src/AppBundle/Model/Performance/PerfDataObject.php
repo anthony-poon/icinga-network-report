@@ -1,7 +1,7 @@
 <?php
 namespace AppBundle\Model\Performance;
 
-use AppBundle\DbObject\ClassicDbConnector;
+use AppBundle\DbObject\ReportDbConnector;
 use PDO;
 
 class PerfDataObject {    
@@ -15,7 +15,7 @@ class PerfDataObject {
     private $endDate;
     private $serivceId;
     public function __construct($id, $option) {
-        self::$db = new ClassicDbConnector();
+        self::$db = new ReportDbConnector();
         $this->serivceId = $id;
         $this->startDate = $option["startDate"];
         $this->endDate = $option["endDate"];
@@ -32,7 +32,7 @@ class PerfDataObject {
     }
     private function populateRawData($hostId) {
         $allData = array();
-        $statement = "SELECT * FROM ".ClassicDbConnector::DB_PREFIX."perfdata WHERE (service_object_id = :service_object_id) AND (DATE(status_update_time) BETWEEN :start_date AND :end_date) GROUP BY `status_update_time`";
+        $statement = "SELECT * FROM ".ReportDbConnector::DB_PREFIX."perfdata WHERE (service_object_id = :service_object_id) AND (DATE(status_update_time) BETWEEN :start_date AND :end_date) GROUP BY `status_update_time`";
         $query = self::$db->prepare($statement);
         $query->bindValue(":service_object_id", $this->serivceId);
         $query->bindValue(":start_date", $this->startDate->format("Y-m-d"));
@@ -53,7 +53,7 @@ class PerfDataObject {
     }
     
     private function populateInfo() {
-        $statement = "SELECT * FROM ".ClassicDbConnector::DB_PREFIX."data_object_definition WHERE service_id = :service_id";
+        $statement = "SELECT * FROM ".ReportDbConnector::DB_PREFIX."perf_object_definition WHERE service_id = :service_id";
         $query = self::$db->prepare($statement);
         $query->bindValue(":service_id", $this->serivceId);
         $query->execute();

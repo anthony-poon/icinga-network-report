@@ -8,8 +8,8 @@ use PDO;
 require_once __DIR__.'/DefinedDataObject.php';
 
 function getAllDefinedObject() {
-    $db = new \ClassicDbConnector();
-    $statement = "SELECT service_id FROM report_data_object_definition";
+    $db = new \ReportDbConnector();
+    $statement = "SELECT service_id FROM report_perf_object_definition";
     $query = $db->prepare($statement);
     $query->execute();
     while ($result = $query->fetch(PDO::FETCH_ASSOC)) {

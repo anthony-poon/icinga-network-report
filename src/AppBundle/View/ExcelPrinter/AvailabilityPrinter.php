@@ -3,6 +3,7 @@ namespace AppBundle\View\ExcelPrinter;
 
 use PHPExcel;
 use PHPExcel_IOFactory;
+use PHPExcel_Style_Alignment;
 class AvailabilityPrinter {
     const START_COL = 0;
     const START_ROW = 1;
@@ -18,6 +19,10 @@ class AvailabilityPrinter {
         $this->endDate = $endDate;
         $this->numberOfAvailabilityNode = count($data);
         $this->workbook = new PHPExcel();
+        $this->workbook
+                ->getDefaultStyle()
+                ->getAlignment()
+                ->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
         $this->workbook->removeSheetByIndex(0);
     }
     
@@ -45,22 +50,32 @@ class AvailabilityPrinter {
             $col = $col + 1;
             $row = 3;
             $sheet->setCellValueByColumnAndRow($col , $row++, $availabilityNode->getDisplayName());
-            foreach($availabilityNode->getAllnotification() as $date => $notificationArray) {
-                if ($availabilityNode->getState($date) === 0) {
+            foreach($availabilityNode->getPrintData() as $dateString => $notificationArray) {
+                if (empty($notificationArray)) {
                     $sheet->setCellValueByColumnAndRow($col , $row++, "OK");
                 } else {
                     $msgArray = array();
-                    $strLength = 0;
+                    $strLength = 0;                    
                     foreach ($notificationArray as $notification) {
-                        $detailArray[$availabilityNode->getDisplayName()][] = $notification;
-                        $msg = $notification->getTime()." - ".$availabilityNode->getDisplayName().": ".$notification->getMessage();
+                        //$detailArray[$notification["name"]][] = $notification;
+                        $msg = $notification["time"]." - ".$notification["name"].": ".$notification["message"];
                         $msgArray[] = $msg;
                         if (strlen($msg) > $strLength) {
                             $strLength = strlen($msg);
                         }
                     }
                     $allNotificationMsg = implode("\n", $msgArray);
-                    $sheet->setCellValueByColumnAndRow($col , $row, "Down");
+                    switch ($availabilityNode->getState($dateString)) {
+                        case "0":
+                            $sheet->setCellValueByColumnAndRow($col , $row, "OK");
+                            break;
+                        case "1":
+                            $sheet->setCellValueByColumnAndRow($col , $row, "Down");
+                            break;
+                        case "2":
+                            $sheet->setCellValueByColumnAndRow($col , $row, "Ack");
+                            break;
+                    }
                     $cell = $sheet->getCellByColumnAndRow($col , $row);
                     $coordStr = $cell->getCoordinate();
                     $sheet->getComment($coordStr)->getText()->createTextRun($allNotificationMsg);
@@ -74,35 +89,47 @@ class AvailabilityPrinter {
                 } 
             }
         }
-        foreach ($detailArray as $name => $detail) {
-            $this->printNotificationDetail($name, $detail);
+        foreach ($this->content as $availabilityNode) {
+            $this->printNotificationDetail($availabilityNode);
         }
         for ($i = 0; $i <= $this->numberOfAvailabilityNode + self::START_COL; $i ++) {
             $sheet->getColumnDimensionByColumn($i)->setAutoSize(TRUE);
         }
     }
     
-    private function printNotificationDetail($hostname, $detailArray) {
-        $sheet = $this->workbook->createSheet();
-        $hostname = preg_replace("/\s/", "_", $hostname);
-        $hostname = preg_replace("/:/", "", $hostname);
-        $sheet->setTitle($hostname."_Detail");
-        $row = self::START_ROW;
-        $col = self::START_COL;
-        $sheet->setCellValueByColumnAndRow($col , $row++, $hostname." Notifications");
-        $row++;
-        $sheet->setCellValueByColumnAndRow($col++ , $row, "Timestamp");
-        $sheet->setCellValueByColumnAndRow($col++ , $row, "Object Name");
-        $sheet->setCellValueByColumnAndRow($col++ , $row++, "Message");
-        foreach ($detailArray as $detail) {
+    private function printNotificationDetail($availabilityNode) {
+        if (!$availabilityNode->isEmpty()) {
+            $sheet = $this->workbook->createSheet();
+            $hostname = preg_replace("/\s/", "_", $availabilityNode->getDisplayName());
+            $hostname = preg_replace("/:/", "", $hostname);
+            $sheet->setTitle($hostname."_Detail");
+            $row = self::START_ROW;
             $col = self::START_COL;
-            $sheet->setCellValueByColumnAndRow($col++ , $row, $detail->getTime());
-            $sheet->setCellValueByColumnAndRow($col++ , $row, $hostname);
-            $sheet->setCellValueByColumnAndRow($col++ , $row, $detail->getMessage());
+            $sheet->setCellValueByColumnAndRow($col , $row++, $hostname);
             $row++;
-        }
-        for ($i = 0; $i <= count($detailArray) + self::START_COL; $i ++) {
-            $sheet->getColumnDimensionByColumn($i)->setAutoSize(TRUE);
+            $sheet->setCellValueByColumnAndRow($col++ , $row, "Notification Id");
+            $sheet->setCellValueByColumnAndRow($col++ , $row, "Timestamp");
+            $sheet->setCellValueByColumnAndRow($col++ , $row, "Object Name");
+            $sheet->setCellValueByColumnAndRow($col++ , $row, "Message");
+            $sheet->setCellValueByColumnAndRow($col++ , $row++, "State Type");
+            $maxCol = 0;
+            foreach ($availabilityNode->getPrintData() as $dateString => $notificationArray) {
+                foreach ($notificationArray as $notification) {
+                    $col = self::START_COL;
+                    $sheet->setCellValueByColumnAndRow($col++ , $row, $notification["id"]);
+                    $sheet->setCellValueByColumnAndRow($col++ , $row, $notification["time"]);
+                    $sheet->setCellValueByColumnAndRow($col++ , $row, $notification["name"]);
+                    $sheet->setCellValueByColumnAndRow($col++ , $row, $notification["message"]);
+                    $sheet->setCellValueByColumnAndRow($col++ , $row, $notification["state"]);
+                    if ($maxCol < $col) {
+                        $maxCol = $col;
+                    }
+                    $row++;
+                }
+            }
+            for ($i = 0; $i <= $maxCol + self::START_COL; $i ++) {
+                $sheet->getColumnDimensionByColumn($i)->setAutoSize(TRUE);
+            }
         }
     }
     

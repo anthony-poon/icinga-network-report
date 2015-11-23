@@ -14,7 +14,7 @@ class IcingaDbConnector extends PDO{
     }
 }
 
-class ClassicDbConnector extends PDO{
+class ReportDbConnector extends PDO{
     const DB_ENGI = "mysql";
     const DB_NAME = "ido_reporting";
     const DB_USER = "ido_reporting";
@@ -35,7 +35,7 @@ class DefinedDataObject {
     private static $dbConnector;
     public function __construct($id) {
         self::$idoConnector = new IcingaDbConnector();
-        self::$dbConnector = new ClassicDbConnector();
+        self::$dbConnector = new ReportDbConnector();
         $this->id = $id;
     }
     public function getServiceId(){
@@ -60,7 +60,7 @@ class DefinedDataObject {
         if (empty($dataArray)){
             throw new Exception("Unable to get data for object id:".$this->getServiceId());
         }
-        $statement = "INSERT INTO ".ClassicDbConnector::DB_PREFIX."perfdata (host_object_id, service_object_id, status_update_time, output, perfdata, current_state) VALUES (:host_object_id, :service_object_id, :status_update_time, :output, :perfdata, :current_state)";
+        $statement = "INSERT INTO ".ReportDbConnector::DB_PREFIX."perfdata (host_object_id, service_object_id, status_update_time, output, perfdata, current_state) VALUES (:host_object_id, :service_object_id, :status_update_time, :output, :perfdata, :current_state)";
         $query = self::$dbConnector->prepare($statement);
         $query->bindValue(":host_object_id", $dataArray["host_object_id"]);
         $query->bindValue(":service_object_id", $dataArray["service_object_id"]);

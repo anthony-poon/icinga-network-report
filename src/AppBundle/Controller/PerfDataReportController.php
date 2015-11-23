@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use AppBundle\DbObject\ClassicDbConnector;
+use AppBundle\DbObject\ReportDbConnector;
 use AppBundle\Model\Performance\PerfDataObject;
 use AppBundle\View\ExcelPrinter\PerfDataPrinter;
 use DateTime;
@@ -20,7 +20,7 @@ class PerfDataReportController extends Controller {
     private static $db;
 
     public function __construct() {
-        self::$db = new ClassicDbConnector();
+        self::$db = new ReportDbConnector();
     }
 
     public function getReport(Request $request) {
