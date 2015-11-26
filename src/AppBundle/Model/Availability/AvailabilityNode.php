@@ -39,8 +39,9 @@ class AvailabilityNode {
                         if (!empty($this->allAcknowledge)) {
                             foreach ($this->allAcknowledge as $acknowledge) {
                                 $startDateObj = DateTime::createFromFormat("Y-m-d H:i:s", $acknowledge["time_start"]);
-                                $endDateObj = DateTime::createFromFormat("Y-m-d H:i:s", $acknowledge["time_end"]);
-                                if (($startDateObj > $notification["time"]) || ($endDateObj < $notification["time"])) {
+                                $endDateObj = DateTime::createFromFormat("Y-m-d H:i:s", $acknowledge["time_end"]);                                
+                                $notificationTimestampObj = DateTime::createFromFormat("Y-m-d H:i:s", $notification["time"]);
+                                if (($startDateObj <= $notificationTimestampObj) && ($endDateObj >= $notificationTimestampObj)) {
                                     $this->state[$dateString] = "2";
                                     $notification["message"] = " *".$acknowledge["reason"]."* ".$notification["message"];
                                 }
