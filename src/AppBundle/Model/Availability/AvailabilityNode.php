@@ -41,9 +41,13 @@ class AvailabilityNode {
                                 $startDateObj = DateTime::createFromFormat("Y-m-d H:i:s", $acknowledge["time_start"]);
                                 $endDateObj = DateTime::createFromFormat("Y-m-d H:i:s", $acknowledge["time_end"]);                                
                                 $notificationTimestampObj = DateTime::createFromFormat("Y-m-d H:i:s", $notification["time"]);
-                                if (($startDateObj <= $notificationTimestampObj) && ($endDateObj >= $notificationTimestampObj)) {
-                                    $this->state[$dateString] = "2";
+                                if (($startDateObj <= $notificationTimestampObj) && ($endDateObj >= $notificationTimestampObj)) {                                    
                                     $notification["message"] = " *".$acknowledge["reason"]."* ".$notification["message"];
+                                    if ($this->state[$dateString] === "0") {
+                                        $this->state[$dateString] = "2";
+                                    }
+                                } else {
+                                    $this->state[$dateString] = "1";
                                 }
                             }
                         } else {
