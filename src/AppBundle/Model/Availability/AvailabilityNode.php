@@ -2,8 +2,9 @@
 namespace AppBundle\Model\Availability;
 
 use DateTime;
+use JsonSerializable;
 
-class AvailabilityNode {
+class AvailabilityNode implements JsonSerializable{
     //put your code here
     private $startDate;
     private $endDate;
@@ -28,7 +29,7 @@ class AvailabilityNode {
         $this->allAcknowledge = $this->acknowledgeObj->getOutputArray();
         foreach ($serviceIdArray as $serviceId) {
             $notificationObj = new NotificationNode($serviceId, $this->startDate, $this->endDate);
-            $notificationOutput = $notificationObj->getOutputArray();
+            $notificationOutput = $notificationObj->jsonSerialize();
             foreach($notificationOutput as $dateString => &$notificationInADay) {                
                 if (!empty($notificationInADay)) {
                     $this->isEmpty = false;
@@ -60,25 +61,6 @@ class AvailabilityNode {
             
         }
     }
-    public function getStartDate() {
-        return $this->startDate;
-    }
-
-    public function getEndDate() {
-        return $this->endDate;
-    }
-    
-    public function getDisplayName() {
-        return $this->displayName;
-    }
-
-    public function getOrder() {
-        return $this->order;
-    }
-
-    public function getPrintData() {
-        return $this->printData;
-    }
 
     public function setDisplayName($displayName) {
         $this->displayName = $displayName;
@@ -86,13 +68,17 @@ class AvailabilityNode {
 
     public function setOrder($order) {
         $this->order = $order;
-    }
+    }            
     
-    public function isEmpty() {
-        return $this->isEmpty;
-    }
-    
-    public function getState($dateString) {
-        return $this->state[$dateString];
+    public function jsonSerialize() {
+        $metaData = array(
+            "startDate" => $this->startDate,
+            "endDate" => $this->endDate,
+            "displayName" => $this->displayName,
+            "order" => $this->order,
+            "isEmpty" => $this->isEmpty,
+            "state" => $this->state            
+        );
+        return array_merge($metaData, array("printData" => $this->printData));
     }
 }

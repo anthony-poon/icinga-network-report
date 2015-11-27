@@ -16,7 +16,7 @@ class ReportController extends Controller{
     public function getAvailabilityReport(Request $request) {
         $response = new Response();
         $data = array();
-        $data["debug"] = $request->query->get('debug');
+        $debug = $request->query->get('debug');
         $month = $request->query->get('month');
         if (!$month) {
             $month = date("m");
@@ -30,11 +30,14 @@ class ReportController extends Controller{
         if ($endDate > new DateTime()) {
             $endDate = new DateTime();
         }
-        $dataFactory = new AvailabilityFactory($startDate, $endDate);
-        $dataObject = $dataFactory->getAvailability();
-        $printer = new AvailabilityPrinter($dataObject, $startDate, $endDate);
+        $availabiltyModel = new AvailabilityFactory($startDate, $endDate);
+        $serializedData = $availabiltyModel->jsonSerialize();
+        $metaData = array(
+            "debugMode" => $debug
+        );
+        $printer = new AvailabilityPrinter(array_merge($metaData, $serializedData));
         $printer->build();
-        if (!$data["debug"]) {
+        if (!$debug) {
             $response->headers->set("Content-type", "application/vnd.ms-excel");
             $disposition = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'report.xlsx');
             $response->headers->set("Content-Disposition", $disposition);

@@ -3,8 +3,9 @@ namespace AppBundle\Model\Availability;
 
 use AppBundle\DbObject\IcingaDbConnector;
 use DateTime;
+use JsonSerializable;
 
-class NotificationNode {
+class NotificationNode implements JsonSerializable {
     //put your code here
     private $output;
     private static $idoDb;
@@ -31,7 +32,11 @@ class NotificationNode {
         }
     }
     
-    public function getOutputArray(){
+    public function jsonSerialize() {
         return $this->output;
+    }
+    
+    public function getAsJson() {
+        return json_encode($this);
     }
 }

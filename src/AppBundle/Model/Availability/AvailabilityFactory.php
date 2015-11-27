@@ -4,8 +4,10 @@ use AppBundle\DbObject\IcingaDbConnector;
 use AppBundle\DbObject\ReportDbConnector;
 use PDO;
 use DateTime;
+use JsonSerializable;
 
-class AvailabilityFactory {
+
+class AvailabilityFactory implements JsonSerializable{
     //put your code here
     private static $reportDb;
     private static $idoDb;
@@ -37,14 +39,19 @@ class AvailabilityFactory {
         }
     }
     
-    public function getAvailability() {
+    public function jsonSerialize() {
         $output = array();
         foreach ($this->allObj as $availObjId => $queryObj) {
             $availability = new AvailabilityNode($availObjId, $queryObj["service_id"], $this->startDate, $this->endDate);
             $availability->setDisplayName($queryObj["display_name"]);
             $availability->setOrder($queryObj["order"]);
-            $output[] = $availability;
+            $output[] = $availability->jsonSerialize();
         }
-        return $output;
+        $metaData = array(
+            "count" => count($output),
+            "startDate" => $this->startDate->format("Y-m-d H:i:s"),
+            "endDate" => $this->endDate->format("Y-m-d H:i:s")            
+        );
+        return array_merge($metaData, array("printData" => $output));
     }
 }

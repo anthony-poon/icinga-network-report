@@ -2,7 +2,6 @@
 namespace AppBundle\Model\Availability;
 
 use AppBundle\DbObject\ReportDbConnector;
-use DateTime;
 
 class ProblemAcknowledge {
     private $startDate;

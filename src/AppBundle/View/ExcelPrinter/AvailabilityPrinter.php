@@ -4,20 +4,22 @@ namespace AppBundle\View\ExcelPrinter;
 use PHPExcel;
 use PHPExcel_IOFactory;
 use PHPExcel_Style_Alignment;
+use DateTime;
 class AvailabilityPrinter {
     const START_COL = 0;
     const START_ROW = 1;
+    const COMMENT_MAX_HEIGHT = 300;
     private $debugMode = 0;
-    private $content;
+    private $count;
     private $startDate;
     private $endDate;
-    private $numberOfAvailabilityNode;
     
-    public function __construct($data, $startDate, $endDate) {
-        $this->content = $data;
-        $this->startDate = $startDate;
-        $this->endDate = $endDate;
-        $this->numberOfAvailabilityNode = count($data);
+    public function __construct($serializedData) {
+        $this->debugMode = $serializedData["debugMode"];
+        $this->printData = $serializedData["printData"];
+        $this->startDate = DateTime::createFromFormat("Y-m-d H:i:s", $serializedData["startDate"]);
+        $this->endDate = DateTime::createFromFormat("Y-m-d H:i:s", $serializedData["endDate"]);
+        $this->count = $serializedData["count"];
         $this->workbook = new PHPExcel();
         $this->workbook
                 ->getDefaultStyle()
@@ -26,15 +28,7 @@ class AvailabilityPrinter {
         $this->workbook->removeSheetByIndex(0);
     }
     
-    public function setDebugMode($mode) {
-        $this->debugMode = $mode;
-    }    
-    
-    public function build() {
-        $this->printAvailabilityTable();
-    }
-    
-    private function printAvailabilityTable(){
+    public function build(){
         $sheet = $this->workbook->createSheet();
         $sheet->setTitle("Availability");
         $row = self::START_ROW;
@@ -45,12 +39,13 @@ class AvailabilityPrinter {
         foreach ($dateRange as $date) {
             $sheet->setCellValueByColumnAndRow($col , $row++, $date->format("Y-m-d"));
         }
-        $detailArray = array();
-        foreach ($this->content as $availabilityNode) {
+
+        foreach ($this->printData as $availabilityNode) {
             $col = $col + 1;
             $row = 3;
-            $sheet->setCellValueByColumnAndRow($col , $row++, $availabilityNode->getDisplayName());
-            foreach($availabilityNode->getPrintData() as $dateString => $notificationArray) {
+            
+            $sheet->setCellValueByColumnAndRow($col , $row++, $availabilityNode["displayName"]);
+            foreach($availabilityNode["printData"] as $dateString => $notificationArray) {
                 if (empty($notificationArray)) {
                     $sheet->setCellValueByColumnAndRow($col , $row++, "OK");
                 } else {
@@ -65,7 +60,7 @@ class AvailabilityPrinter {
                         }
                     }
                     $allNotificationMsg = implode("\n", $msgArray);
-                    switch ($availabilityNode->getState($dateString)) {
+                    switch ($availabilityNode["state"][$dateString]) {
                         case "0":
                             $sheet->setCellValueByColumnAndRow($col , $row, "OK");
                             break;
@@ -81,31 +76,31 @@ class AvailabilityPrinter {
                     $sheet->getComment($coordStr)->getText()->createTextRun($allNotificationMsg);
                     $sheet->getComment($coordStr)->setWidth(($strLength*7)."px");
                     $height = count($notificationArray)*25;
-                    if ($height > 300) {
-                        $height = 300;
+                    if ($height > self::COMMENT_MAX_HEIGHT) {
+                        $height = self::COMMENT_MAX_HEIGHT;
                     }
                     $sheet->getComment($coordStr)->setHeight($height."px");
                     $row++;
                 } 
             }
         }
-        foreach ($this->content as $availabilityNode) {
+        foreach ($this->printData as $availabilityNode) {
             $this->printNotificationDetail($availabilityNode);
         }
-        for ($i = 0; $i <= $this->numberOfAvailabilityNode + self::START_COL; $i ++) {
+        for ($i = 0; $i <= $this->count + self::START_COL; $i ++) {
             $sheet->getColumnDimensionByColumn($i)->setAutoSize(TRUE);
         }
     }
     
     private function printNotificationDetail($availabilityNode) {
-        if (!$availabilityNode->isEmpty()) {
+        if (!$availabilityNode["isEmpty"]) {
             $sheet = $this->workbook->createSheet();
-            $hostname = preg_replace("/\s/", "_", $availabilityNode->getDisplayName());
-            $hostname = preg_replace("/:/", "", $hostname);
-            $sheet->setTitle($hostname."_Detail");
+            $escapedName = preg_replace("/\s/", "_", $availabilityNode["displayName"]);
+            $escapedName = preg_replace("/:/", "", $escapedName);
+            $sheet->setTitle($escapedName."_Detail");
             $row = self::START_ROW;
             $col = self::START_COL;
-            $sheet->setCellValueByColumnAndRow($col , $row++, $hostname);
+            $sheet->setCellValueByColumnAndRow($col , $row++, $escapedName);
             $row++;
             $sheet->setCellValueByColumnAndRow($col++ , $row, "Notification Id");
             $sheet->setCellValueByColumnAndRow($col++ , $row, "Timestamp");
@@ -113,7 +108,7 @@ class AvailabilityPrinter {
             $sheet->setCellValueByColumnAndRow($col++ , $row, "Message");
             $sheet->setCellValueByColumnAndRow($col++ , $row++, "State Type");
             $maxCol = 0;
-            foreach ($availabilityNode->getPrintData() as $dateString => $notificationArray) {
+            foreach ($availabilityNode["printData"] as $dateString => $notificationArray) {
                 foreach ($notificationArray as $notification) {
                     $col = self::START_COL;
                     $sheet->setCellValueByColumnAndRow($col++ , $row, $notification["id"]);
