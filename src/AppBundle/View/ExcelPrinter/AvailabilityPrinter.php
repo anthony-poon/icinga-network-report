@@ -34,7 +34,9 @@ class AvailabilityPrinter {
         $row = self::START_ROW;
         $col = self::START_COL;
         $sheet->setCellValueByColumnAndRow($col , $row++, "Availability Report");
-        $row = $row + 2;
+        $row = $row + 1;
+        $sheet->setCellValueByColumnAndRow($col , $row++, "Object Id");
+        $sheet->setCellValueByColumnAndRow($col , $row++, "Object Name");
         $dateRange = new \DatePeriod($this->startDate, new \DateInterval("P1D"), $this->endDate);
         foreach ($dateRange as $date) {
             $sheet->setCellValueByColumnAndRow($col , $row++, $date->format("Y-m-d"));
@@ -43,7 +45,7 @@ class AvailabilityPrinter {
         foreach ($this->printData as $availabilityNode) {
             $col = $col + 1;
             $row = 3;
-            
+            $sheet->setCellValueByColumnAndRow($col , $row++, $availabilityNode["availObjId"]);
             $sheet->setCellValueByColumnAndRow($col , $row++, $availabilityNode["displayName"]);
             foreach($availabilityNode["printData"] as $dateString => $notificationArray) {
                 if (empty($notificationArray)) {

@@ -77,7 +77,8 @@ class AvailabilityNode implements JsonSerializable{
             "displayName" => $this->displayName,
             "order" => $this->order,
             "isEmpty" => $this->isEmpty,
-            "state" => $this->state            
+            "state" => $this->state,
+            "availObjId" => $this->availObjId
         );
         return array_merge($metaData, array("printData" => $this->printData));
     }
