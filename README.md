@@ -12,6 +12,7 @@ Structure
 - src
   - AppBundle
     - Command
+      - GetDataFromIdo => Symfony cli command that query data from Icinga2
       - CurlUploadCommand.php => a PHP script that will upload the xlsx report via HTTP to my private server using cURL
       - EmailCommand.php => PHP script that is run by crontab to email every 10:00 PM
     - Controller
@@ -20,10 +21,6 @@ Structure
     - DbObject
       - ReportDbConnector.php => Predefined PDO object to connect to self database
       - IcingaDbConnector.php => Predefinded PDO object to connect to Icinga's database
-    - IdoDataGrabber
-      - PHP scripts that run seperate from Symfony. Run directly from command line / crontab. Grab data from Icinga and insert into self db
-        - To Do:
-          - Rewrite into Symfony Cli.
     - Model
       - Contains all the data/model object
         - Availability => Data object for availability report
