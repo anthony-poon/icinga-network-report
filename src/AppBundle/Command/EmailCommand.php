@@ -32,11 +32,13 @@ class EmailCommand extends ContainerAwareCommand {
         ->setFrom('root@asia-minerals.com')
         ->setTo($dest)
         ->setBody('As attached');
+		
         $reportList = self::$db->getAllReportGroupId();
+		// Need to add http 404 or timeout
         foreach ($reportList as $groupId => $filename) {
-            $mail->attach(Swift_Attachment::fromPath("http://ubuntu14/report/web/app_dev.php/perf?group=$groupId")->setFilename("$filename.xlsx"));
+            $mail->attach(Swift_Attachment::fromPath("http://ubuntu-test/report/web/app_dev.php/perf?group=$groupId")->setFilename("$filename.xlsx"));
         }
-        $mail->attach(Swift_Attachment::fromPath("http://ubuntu14/report/web/app_dev.php/ava_report")->setFilename("availability_report.xlsx"));
+        $mail->attach(Swift_Attachment::fromPath("http://ubuntu-test/report/web/app_dev.php/ava_report")->setFilename("availability_report.xlsx"));
         $this->getContainer()->get('mailer')->send($mail);
     }
 }

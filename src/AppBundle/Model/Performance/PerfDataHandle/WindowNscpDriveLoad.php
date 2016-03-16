@@ -1,8 +1,9 @@
 <?php
 namespace AppBundle\Model\Performance\PerfDataHandle;
 
+use AppBundle\Model\Performance\PerfDataHandle\HandleBaseClass;
 //Hard code to Gb first
-class WindowNscpDriveLoad {
+class WindowNscpDriveLoad extends HandleBaseClass{
     public function parseData($rawDataArray){
         $outputArray = array();
         foreach ($rawDataArray as $timestamp => $dataArray) {
@@ -22,6 +23,10 @@ class WindowNscpDriveLoad {
     }
     public function parseDataDayAverage($rawDataArray) {
         $outputArray = array();
+        foreach ($this->dateArray as $dateString) {
+            $tempArray[$dateString]["Used Space(GB)"] = array();
+            $tempArray[$dateString]["Total Space(GB)"] = array();
+        }
         $data = $this->parseData($rawDataArray);
         foreach ($data as $timestamp => $dataSet) {
             preg_match("/^([0-9-]+) ([0-9:]+)$/", $timestamp, $match);
@@ -30,6 +35,7 @@ class WindowNscpDriveLoad {
             $tempArray[$date]["Total Space(GB)"][] = $dataSet["Total Space(GB)"];
         }
         foreach ($tempArray as $datestamp => $tempDataSetArray) {
+            $outputArray[$datestamp] = array();
             foreach ($tempDataSetArray as $dataSetName => $allData) {
                 $sum = 0;
                 $count = 0;

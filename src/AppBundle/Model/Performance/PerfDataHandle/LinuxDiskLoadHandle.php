@@ -1,7 +1,9 @@
 <?php
 namespace AppBundle\Model\Performance\PerfDataHandle;
 
-class LinuxDiskLoadHandle {
+use AppBundle\Model\Performance\PerfDataHandle\HandleBaseClass;
+
+class LinuxDiskLoadHandle extends HandleBaseClass{
     //put your code here
     public function parseData($rawDataArray){
         $outputArray = array();
@@ -28,6 +30,10 @@ class LinuxDiskLoadHandle {
     }
     public function parseDataDayAverage($rawDataArray) {
         $outputArray = array();
+        foreach ($this->dateArray as $dateString) {
+            $tempArray[$dateString]["Available Space (MB)"] = array();
+            $tempArray[$dateString]["Total Space (MB)"] = array();
+        }
         $data = $this->parseData($rawDataArray);
         foreach ($data as $timestamp => $dataSet) {
             preg_match("/^([0-9-]+) ([0-9:]+)$/", $timestamp, $match);
@@ -36,6 +42,7 @@ class LinuxDiskLoadHandle {
             $tempArray[$date]["Total Space (MB)"][] = $dataSet["Total Space (MB)"];
         }
         foreach ($tempArray as $datestamp => $tempDataSetArray) {
+            $outputArray[$datestamp] = array();
             foreach ($tempDataSetArray as $dataSetName => $allData) {
                 $sum = 0;
                 $count = 0;

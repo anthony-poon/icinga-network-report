@@ -16,7 +16,7 @@ class PerfDataObject {
     private $serivceId;
     public function __construct($id, $option) {
         self::$db = new ReportDbConnector();
-        $this->serivceId = $id;
+        $this->serivceId = $id;        
         $this->startDate = $option["startDate"];
         $this->endDate = $option["endDate"];
         $this->isVerbal = $option["isVerbal"];
@@ -26,7 +26,9 @@ class PerfDataObject {
             if ($this->isVerbal) {
                 $this->dataArray = $this->dataHandle->parseData($this->rawData);
             } else {
+                $this->dataHandle->setPeriod($this->startDate, $this->endDate);
                 $this->dataArray = $this->dataHandle->parseDataDayAverage($this->rawData);
+                
             }
         }
     }

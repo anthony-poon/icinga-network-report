@@ -1,7 +1,9 @@
 <?php
 namespace AppBundle\Model\Performance\PerfDataHandle;
 
-class CpuWindowHandle {
+use AppBundle\Model\Performance\PerfDataHandle\HandleBaseClass;
+
+class CpuWindowHandle extends HandleBaseClass{
     public function parseData($rawDataArray){
         $outputArray = array();
         foreach ($rawDataArray as $timestamp => $dataArray) {
@@ -18,7 +20,9 @@ class CpuWindowHandle {
     }
     public function parseDataDayAverage($rawDataArray) {
         $outputArray = array();
-        $tempArray = array();
+        foreach ($this->dateArray as $dateString) {
+            $tempArray[$dateString]["60 min avg Load"] = array();
+        }
         $data = $this->parseData($rawDataArray);
         foreach ($data as $timestamp => $dataSet) {
             preg_match("/^([0-9-]+) ([0-9:]+)$/", $timestamp, $match);
@@ -27,6 +31,7 @@ class CpuWindowHandle {
         }
         
         foreach ($tempArray as $datestamp => $tempDataSetArray) {
+            $outputArray[$datestamp] = array();
             foreach ($tempDataSetArray as $dataSetName => $allData) {
                 $sum = 0;
                 $count = 0;

@@ -1,6 +1,9 @@
 <?php
 namespace AppBundle\Model\Performance\PerfDataHandle;
-class MemoryWindowHandle {
+
+use AppBundle\Model\Performance\PerfDataHandle\HandleBaseClass;
+
+class MemoryWindowHandle extends HandleBaseClass{
     public function parseData($rawDataArray){
         $outputArray = array();
         foreach ($rawDataArray as $timestamp => $dataArray) {
@@ -21,6 +24,10 @@ class MemoryWindowHandle {
     }
     public function parseDataDayAverage($rawDataArray) {
         $outputArray = array();
+        foreach ($this->dateArray as $dateString) {
+            $tempArray[$dateString]["Memory usage(MB)"] = array();
+            $tempArray[$dateString]["Total Memory(MB)"] = array();
+        }
         $data = $this->parseData($rawDataArray);
         foreach ($data as $timestamp => $dataSet) {
             preg_match("/^([0-9-]+) ([0-9:]+)$/", $timestamp, $match);
@@ -29,6 +36,7 @@ class MemoryWindowHandle {
             $tempArray[$date]["Total Memory(MB)"][] = $dataSet["Total Memory(MB)"];
         }
         foreach ($tempArray as $datestamp => $tempDataSetArray) {
+            $outputArray[$datestamp] = array();
             foreach ($tempDataSetArray as $dataSetName => $allData) {
                 $sum = 0;
                 $count = 0;

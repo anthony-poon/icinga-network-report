@@ -1,6 +1,9 @@
 <?php
 namespace AppBundle\Model\Performance\PerfDataHandle;
-class PingWindowHandle {
+
+use AppBundle\Model\Performance\PerfDataHandle\HandleBaseClass;
+
+class PingWindowHandle extends HandleBaseClass{
     public function parseData($rawDataArray){       
         $outputArray = array();
         foreach ($rawDataArray as $timestamp => $dataArray) {
@@ -18,6 +21,9 @@ class PingWindowHandle {
     }
     public function parseDataDayAverage($rawDataArray) {
         $outputArray = array();
+        foreach ($this->dateArray as $dateString) {
+            $tempArray[$dateString]["Round Trip Time (ms)"] = array();
+        }
         $data = $this->parseData($rawDataArray);
         foreach ($data as $timestamp => $dataSet) {
             preg_match("/^([0-9-]+) ([0-9:]+)$/", $timestamp, $match);
@@ -25,6 +31,7 @@ class PingWindowHandle {
             $tempArray[$date]["Round Trip Time (ms)"][] =$dataSet["Round Trip Time (ms)"];
         }
         foreach ($tempArray as $datestamp => $tempDataSetArray) {
+            $outputArray[$datestamp] = array();
             foreach ($tempDataSetArray as $dataSetName => $allData) {
                 $sum = 0;
                 $count = 0;
@@ -41,6 +48,7 @@ class PingWindowHandle {
                 }
             }            
         }
+        
         return $outputArray;
     }
 }

@@ -73,11 +73,12 @@ class ExcelTable {
     }
     
     public function addTableRow($recordArray) {
-        for ($i = 0; $i < count($recordArray); $i ++) {
-            if (!preg_match("/^[0-9.%]+$/", $recordArray[$i])) {
-                $recordArray[$i] = "-";
+        foreach ($recordArray as &$cellValue) {
+            if (!preg_match("/^[0-9.%]+$/", $cellValue)) {
+                $cellValue = "";
             }
         }
+        
         $this->tableRow[] = $recordArray;
         
         //This will run if number of record is more than label.
@@ -168,6 +169,7 @@ class PerfDataPrinter {
     private function printDetailPage($host){
         $sheet = $this->workbook->createSheet();
         $illegalChar = array("*", ":", "/", "\\", "?", "[", "]");
+        
         $sheetName = str_replace($illegalChar, "", $host->getDisplayName());
         $sheetName = str_replace(" ", "_", $sheetName);
         $sheet->setTitle($sheetName);
@@ -175,10 +177,10 @@ class PerfDataPrinter {
         if (!empty($allData)) {
             $table = new ExcelTable(self::TABLE_START_COL, self::TABLE_START_ROW);
             $row = array();
-
-            foreach ($allData as $dataSet) {
+            foreach ($allData as $date => $dataSet) {
+                
                 foreach ($dataSet as $dataName => $dataValue) {
-                    $row[$dataName][] = $dataValue;
+                    $row[$dataName][$date] = $dataValue;
                 }
             }
             $table->setColLabel(array_keys($allData));
